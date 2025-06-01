@@ -1,0 +1,43 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Find Nearby Food</title>
+</head>
+<body>
+  <h2>Receiver Form</h2>
+  <form id="receiveForm">
+    <input name="lat" placeholder="Your Latitude" required><br>
+    <input name="lng" placeholder="Your Longitude" required><br>
+    <button type="submit">Find Food</button>
+  </form>
+  <h3>Nearby Donations:</h3>
+  <div id="results"></div>
+
+  <script>
+    const form = document.getElementById('receiveForm');
+    const results = document.getElementById('results');
+
+    form.onsubmit = async (e) => {
+      e.preventDefault();
+      const formData = new FormData(form);
+      const body = Object.fromEntries(formData.entries());
+
+      const res = await fetch('http://localhost:4123/receive', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+
+      const data = await res.json();
+      if (data.length === 0) {
+        results.innerHTML = " No nearby donations found.";
+      } else {
+        results.innerHTML = data.map(d =>
+          `<p><b>${d.name}</b> donated <i>${d.food}</i> at (${d.lat}, ${d.lng})</p>`
+        ).join('');
+      }
+    };
+  </script>
+</body>
+</html>
